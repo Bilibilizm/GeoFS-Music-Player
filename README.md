@@ -42,5 +42,4 @@ Use
 5.In the settings interface, switch themes, modify shortcut keys, or export/import playlists.
 
 
-
-(Join our discord)[https://discord.gg/4dGHsNqgCH]
+[(Join our discord](https://discord.gg/4dGHsNqgCH)
