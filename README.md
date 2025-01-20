@@ -42,4 +42,12 @@ Use
 5.In the settings interface, switch themes, modify shortcut keys, or export/import playlists.
 
 
+
+
+中文（chinese):
+
+点击右下角的点可以拖动、支持顺换播放或者单曲循环或者列表播放。上传文件支持视频文件或者其他音频文件（视频文件仅播放音频，所以分辨率请调低，文件最大20MB）
+[文件导入视频教程](https://www.bilibili.com/video/BV1pwwseiEfo/?spm_id_from=333.1387.homepage.video_card.click)
+
+
 [Join our discord](https://discord.gg/4dGHsNqgCH)
