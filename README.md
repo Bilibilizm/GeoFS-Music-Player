@@ -16,7 +16,7 @@
 **Theme switching**: Supports dark and light themes, and only affects the internal style of the plugin when switching.
 
 
-**Shortcut key support**: The default shortcut key is M, which can be customized and modified.
+**Shortcut key support**: The default shortcut key is U, which can be customized and modified.
 
 
 **Bottom playback status bar**: Display the name of the currently playing song and set whether to display the status bar.
@@ -46,7 +46,7 @@ Use
 
 中文（chinese):
 
-点击右下角的点可以拖动、支持顺换播放或者单曲循环或者列表播放。上传文件支持视频文件或者其他音频文件（视频文件仅播放音频，所以分辨率请调低，文件最大20MB）
+按U打开界面。点击右下角的点可以拖动、支持顺换播放或者单曲循环或者列表播放。上传文件支持视频文件或者其他音频文件（视频文件仅播放音频，所以分辨率请调低，文件最大20MB）
 [文件导入视频教程](https://www.bilibili.com/video/BV1pwwseiEfo/?spm_id_from=333.1387.homepage.video_card.click)
 
 
