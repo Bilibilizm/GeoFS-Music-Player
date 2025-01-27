@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GeoFS Music Player
-// @version      1.0
+// @version      1.1
 // @match        https://www.geo-fs.com/geofs.php*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=geo-fs.com
 // ==/UserScript==
@@ -10,7 +10,7 @@
 
     // 初始化变量
     let isDarkTheme = true;
-    let shortcutKey = 'M';
+    let shortcutKey = 'U';
     let volume = 0.5; 
     let showButton = true; 
     let showBottomBar = true; 
@@ -19,6 +19,7 @@
     let playMode = 'Sequential';
     let currentPage = 1; 
     const itemsPerPage = 8; 
+    let language = 'en'; // 默认语言
 
     // 创建播放器容器
     const playerContainer = document.createElement('div');
@@ -181,27 +182,27 @@
     utilityButtonsContainer.style.display = 'flex';
     utilityButtonsContainer.style.justifyContent = 'space-between';
 
-// 导入文件按钮
-const importPlaylistButton = createButton('Import Files', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.mp3,.mp4';
-    input.multiple = true;
-    input.onchange = (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            Array.from(files).forEach((file) => {
-                if (checkFileSize(file)) {
-                    const url = URL.createObjectURL(file);
-                    playlist.push({ name: file.name, file: url });
-                }
-            });
-            updatePlaylist();
-            savePlaylistToLocal(); // 保存到本地存储
-        }
-    };
-    input.click();
-});
+    // 导入文件按钮
+    const importPlaylistButton = createButton('Import Files', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.mp3,.mp4';
+        input.multiple = true;
+        input.onchange = (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                Array.from(files).forEach((file) => {
+                    if (checkFileSize(file)) {
+                        const url = URL.createObjectURL(file);
+                        playlist.push({ name: file.name, file: url });
+                    }
+                });
+                updatePlaylist();
+                savePlaylistToLocal(); // 保存到本地存储
+            }
+        };
+        input.click();
+    });
 
     // 设置按钮
     const settingsButton = createButton('Settings', toggleSettings);
@@ -261,24 +262,24 @@ const importPlaylistButton = createButton('Import Files', () => {
         updatePagination();
     }
 
-// 播放歌曲
-function playSong(index) {
-    currentSongIndex = index;
-    const song = playlist[index];
-    if (song.file) {
-        audioPlayer.src = song.file;
-        audioPlayer.play()
-            .then(() => {
-                playPauseButton.innerText = '⏸';
-                bottomBar.innerText = `Now Playing: ${song.name}`;
-                bottomBar.style.display = showBottomBar ? 'block' : 'none';
-            })
-            .catch((error) => {
-                alert(`Failed to play the file: ${error.message}`);
-                console.error('Playback error:', error);
-            });
+    // 播放歌曲
+    function playSong(index) {
+        currentSongIndex = index;
+        const song = playlist[index];
+        if (song.file) {
+            audioPlayer.src = song.file;
+            audioPlayer.play()
+                .then(() => {
+                    playPauseButton.innerText = '⏸';
+                    bottomBar.innerText = language === 'zh' ? `正在播放: ${song.name}` : `Now Playing: ${song.name}`;
+                    bottomBar.style.display = showBottomBar ? 'block' : 'none';
+                })
+                .catch((error) => {
+                    alert(language === 'zh' ? `播放文件失败: ${error.message}` : `Failed to play the file: ${error.message}`);
+                    console.error('Playback error:', error);
+                });
+        }
     }
-}
 
     // 播放控制
     function togglePlayPause() {
@@ -406,35 +407,42 @@ function playSong(index) {
         settingsContainer.style.marginTop = '15px';
 
         // 主题切换
-        const themeButton = createButton(`Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`, () => {
+        const themeButton = createButton(language === 'zh' ? '切换主题 (当前: 暗色)' : 'Toggle Theme (Current: Dark)', () => {
             isDarkTheme = !isDarkTheme;
             updateTheme();
-            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
+            themeButton.innerText = language === 'zh' ? `切换主题 (当前: ${isDarkTheme ? '暗色' : '亮色'})` : `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
         });
 
         // 快捷键修改
-        const shortcutButton = createButton(`Change Shortcut (Current: ${shortcutKey})`, () => {
-            shortcutKey = prompt('Enter new shortcut key (e.g., M):');
+        const shortcutButton = createButton(language === 'zh' ? `更改快捷键 (当前: ${shortcutKey})` : `Change Shortcut (Current: ${shortcutKey})`, () => {
+            shortcutKey = prompt(language === 'zh' ? '输入新的快捷键 (例如, M):' : 'Enter new shortcut key (e.g., M):');
             updateShortcut();
-            shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
+            shortcutButton.innerText = language === 'zh' ? `更改快捷键 (当前: ${shortcutKey})` : `Change Shortcut (Current: ${shortcutKey})`;
         });
 
         // 是否显示点击式按钮
-        const showButtonToggle = createButton(`Show Button (Current: ${showButton ? 'Yes' : 'No'})`, () => {
+        const showButtonToggle = createButton(language === 'zh' ? `显示按钮 (当前: ${showButton ? '是' : '否'})` : `Show Button (Current: ${showButton ? 'Yes' : 'No'})`, () => {
             showButton = !showButton;
             musicButton.style.display = showButton ? 'block' : 'none';
-            showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
+            showButtonToggle.innerText = language === 'zh' ? `显示按钮 (当前: ${showButton ? '是' : '否'})` : `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
         });
 
         // 是否显示底部播放状态栏
-        const showBottomBarToggle = createButton(`Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`, () => {
+        const showBottomBarToggle = createButton(language === 'zh' ? `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})` : `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`, () => {
             showBottomBar = !showBottomBar;
             bottomBar.style.display = showBottomBar ? 'block' : 'none';
-            showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+            showBottomBarToggle.innerText = language === 'zh' ? `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})` : `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+        });
+
+        // 语言切换
+        const languageButton = createButton(language === 'zh' ? '语言 (当前: 中文)' : 'Language (Current: English)', () => {
+            language = language === 'zh' ? 'en' : 'zh';
+            updateLanguage();
+            languageButton.innerText = language === 'zh' ? '语言 (当前: 中文)' : 'Language (Current: English)';
         });
 
         // 导出歌单
-        const exportButton = createButton('Export Playlist', () => {
+        const exportButton = createButton(language === 'zh' ? '导出歌单' : 'Export Playlist', () => {
             const blob = new Blob([JSON.stringify(playlist)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -445,7 +453,7 @@ function playSong(index) {
         });
 
         // 导入歌单
-        const importPlaylistButton = createButton('Import Playlist', () => {
+        const importPlaylistButton = createButton(language === 'zh' ? '导入歌单' : 'Import Playlist', () => {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
@@ -460,12 +468,12 @@ function playSong(index) {
                                 playlist = importedPlaylist;
                                 updatePlaylist();
                                 savePlaylistToLocal();
-                                alert('Playlist imported successfully!');
+                                alert(language === 'zh' ? '歌单导入成功！' : 'Playlist imported successfully!');
                             } else {
-                                alert('Invalid playlist format. Please ensure the file is a valid JSON array.');
+                                alert(language === 'zh' ? '无效的歌单格式。请确保文件是一个有效的JSON数组。' : 'Invalid playlist format. Please ensure the file is a valid JSON array.');
                             }
                         } catch (error) {
-                            alert('Failed to parse the playlist file. Please check the file format.');
+                            alert(language === 'zh' ? '解析歌单文件失败。请检查文件格式。' : 'Failed to parse the playlist file. Please check the file format.');
                         }
                     };
                     reader.readAsText(file);
@@ -474,47 +482,110 @@ function playSong(index) {
             input.click();
         });
 
+        // 关闭设置界面按钮
+        const closeButton = createButton(language === 'zh' ? '关闭' : 'Close', toggleSettings);
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '5px';
+        closeButton.style.right = '5px';
+
         // 将按钮添加到设置界面
         settingsContainer.appendChild(themeButton);
         settingsContainer.appendChild(shortcutButton);
         settingsContainer.appendChild(showButtonToggle);
         settingsContainer.appendChild(showBottomBarToggle);
+        settingsContainer.appendChild(languageButton);
         settingsContainer.appendChild(exportButton);
         settingsContainer.appendChild(importPlaylistButton);
+        settingsContainer.appendChild(closeButton);
 
         // 将设置界面添加到播放器容器
         playerContainer.appendChild(settingsContainer);
     }
 
-// 更新主题
-function updateTheme() {
-    // 更新播放器容器的背景色和文字颜色
-    playerContainer.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
-    playerContainer.style.color = isDarkTheme ? '#fff' : '#000';
+    // 更新主题
+    function updateTheme() {
+        // 更新播放器容器的背景色和文字颜色
+        playerContainer.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
+        playerContainer.style.color = isDarkTheme ? '#fff' : '#000';
 
-    // 更新底部播放状态栏的背景色和文字颜色
-    bottomBar.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
-    bottomBar.style.color = isDarkTheme ? '#fff' : '#000';
+        // 更新底部播放状态栏的背景色和文字颜色
+        bottomBar.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
+        bottomBar.style.color = isDarkTheme ? '#fff' : '#000';
 
-    // 更新进度条和拖动点的颜色
-    progressContainer.style.backgroundColor = isDarkTheme ? '#333' : '#ddd';
-    dragHandle.style.backgroundColor = isDarkTheme ? '#b3b3b3' : '#666';
+        // 更新进度条和拖动点的颜色
+        progressContainer.style.backgroundColor = isDarkTheme ? '#333' : '#ddd';
+        dragHandle.style.backgroundColor = isDarkTheme ? '#b3b3b3' : '#666';
 
-    // 更新时间显示的颜色
-    timeDisplay.style.color = isDarkTheme ? '#b3b3b3' : '#666';
+        // 更新时间显示的颜色
+        timeDisplay.style.color = isDarkTheme ? '#b3b3b3' : '#666';
 
-    // 更新歌单容器的边框颜色
-    playlistContainer.style.borderTop = `1px solid ${isDarkTheme ? '#333' : '#ddd'}`;
+        // 更新歌单容器的边框颜色
+        playlistContainer.style.borderTop = `1px solid ${isDarkTheme ? '#333' : '#ddd'}`;
 
-    // 更新所有插件内部按钮的样式
-    const pluginButtons = playerContainer.querySelectorAll('button');
-    pluginButtons.forEach(button => {
-        if (button !== musicButton) { // 排除点击式按钮
-            button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0';
-            button.style.color = isDarkTheme ? '#b3b3b3' : '#333';
-            button.onmouseleave = () => (button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0');
+        // 更新所有插件内部按钮的样式
+        const pluginButtons = playerContainer.querySelectorAll('button');
+        pluginButtons.forEach(button => {
+            if (button !== musicButton) { // 排除点击式按钮
+                button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0';
+                button.style.color = isDarkTheme ? '#b3b3b3' : '#333';
+                button.onmouseleave = () => (button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0');
+            }
+        });
+    }
+
+// 更新语言
+function updateLanguage() {
+    if (language === 'zh') {
+        title.innerText = 'GeoFS音乐播放器';
+        subtitle.innerText = '由開飛機のzm制作';
+        musicButton.innerText = '🎵';
+        playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
+        modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+        prevButton.innerText = '⏮';
+        nextButton.innerText = '⏭';
+        importPlaylistButton.innerText = '导入文件';
+        settingsButton.innerText = '设置';
+        themeButton.innerText = `切换主题 (当前: ${isDarkTheme ? '暗色' : '亮色'})`;
+        shortcutButton.innerText = `更改快捷键 (当前: ${shortcutKey})`;
+        showButtonToggle.innerText = `显示按钮 (当前: ${showButton ? '是' : '否'})`;
+        showBottomBarToggle.innerText = `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})`;
+        languageButton.innerText = `语言 (当前: 中文)`;
+        exportButton.innerText = '导出歌单';
+        importPlaylistButton.innerText = '导入歌单';
+        closeButton.innerText = '关闭';
+        // 更新播放状态栏文字
+        if (audioPlayer.src) {
+            const currentSong = playlist[currentSongIndex];
+            bottomBar.innerText = `正在播放: ${currentSong ? currentSong.name : 'None'}`;
+        } else {
+            bottomBar.innerText = '正在播放: None';
         }
-    });
+    } else {
+        title.innerText = 'GeoFS Music Player';
+        subtitle.innerText = 'Made by 開飛機のzm';
+        musicButton.innerText = '🎵';
+        playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
+        modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+        prevButton.innerText = '⏮';
+        nextButton.innerText = '⏭';
+        importPlaylistButton.innerText = 'Import Files';
+        settingsButton.innerText = 'Settings';
+        themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
+        shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
+        showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
+        showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+        languageButton.innerText = `Language (Current: English)`;
+        exportButton.innerText = 'Export Playlist';
+        importPlaylistButton.innerText = 'Import Playlist';
+        closeButton.innerText = 'Close';
+        // 更新播放状态栏文字
+        if (audioPlayer.src) {
+            const currentSong = playlist[currentSongIndex];
+            bottomBar.innerText = `Now Playing: ${currentSong ? currentSong.name : 'None'}`;
+        } else {
+            bottomBar.innerText = 'Now Playing: None';
+        }
+    }
 }
 
     // 更新快捷键
@@ -572,11 +643,11 @@ function updateTheme() {
         contextMenu.style.zIndex = '1001';
 
         const renameOption = document.createElement('div');
-        renameOption.innerText = 'Rename';
+        renameOption.innerText = language === 'zh' ? '重命名' : 'Rename';
         renameOption.style.cursor = 'pointer';
         renameOption.style.padding = '4px';
         renameOption.onclick = () => {
-            const newName = prompt('Enter new name:', playlist[index].name);
+            const newName = prompt(language === 'zh' ? '输入新名称:' : 'Enter new name:', playlist[index].name);
             if (newName) {
                 playlist[index].name = newName;
                 updatePlaylist();
@@ -586,7 +657,7 @@ function updateTheme() {
         };
 
         const deleteOption = document.createElement('div');
-        deleteOption.innerText = 'Delete';
+        deleteOption.innerText = language === 'zh' ? '删除' : 'Delete';
         deleteOption.style.cursor = 'pointer';
         deleteOption.style.padding = '4px';
         deleteOption.onclick = () => {
@@ -616,7 +687,7 @@ function updateTheme() {
     function checkFileSize(file) {
         const maxSize = 20 * 1024 * 1024; // 20MB
         if (file.size > maxSize) {
-            alert('File size exceeds 20MB. Please choose a smaller file.');
+            alert(language === 'zh' ? '文件大小超过20MB。请选择较小的文件。' : 'File size exceeds 20MB. Please choose a smaller file.');
             return false;
         }
         return true;
@@ -631,4 +702,5 @@ function updateTheme() {
     updatePlaylist();
     updateShortcut();
     updateTheme();
+    updateLanguage();
 })();
